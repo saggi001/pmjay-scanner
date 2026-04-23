@@ -171,14 +171,31 @@
     }
 
     function processData(text) {
-        let parts = text.split(',');
+       function processData(text) {
+        // पीएमजेएवाय डेटा वेगवेगळ्या चिन्हांनी विभागलेला असू शकतो ( , किंवा | )
+        // हा कोड दोन्ही ओळखून डेटा स्प्लिट करेल
+        let delimiter = text.includes('|') ? '|' : ',';
+        let parts = text.split(delimiter);
 
+        // डेटा ट्रिम (Trim) करून रिकाम्या जागा काढणे
         let person = {
             "PMJAY ID": parts[0]?.trim() || "NA",
             "नाव": parts[1]?.trim() || "NA",
-            "पत्ता": (parts[2] || "") + " " + (parts[3] || ""),
+            "पत्ता": (parts[2]?.trim() || "") + " " + (parts[3]?.trim() || ""),
             "मोबाईल": parts[4]?.trim() || "NA",
             "Family ID": parts[5]?.trim() || "NA"
+        };
+
+        // जर आयडी आधीच स्कॅन केला नसेल तरच ॲड करा
+        if (person["PMJAY ID"] !== "NA" && !masterData.some(d => d["PMJAY ID"] === person["PMJAY ID"])) {
+            masterData.push(person);
+            document.getElementById('count').innerText = masterData.length;
+            renderTable();
+            
+            // मोबाईलला फीडबॅक देण्यासाठी व्हायब्रेशन
+            if(navigator.vibrate) navigator.vibrate(100);
+        }
+    }
         };
 
         // डुप्लिकेट चेक
